@@ -1,0 +1,270 @@
+
+@-webkit-keyframes pump-it-up1 {
+    40% {
+      height: 40px;
+    }
+    60% {
+      height: 35px;
+    }
+    80% {
+      height: 2px;
+    }
+    100% {
+      height: 28px;
+    }
+  }
+  @-moz-keyframes pump-it-up1 {
+    40% {
+      height: 28px;
+    }
+    60% {
+      height: 7px;
+    }
+    80% {
+      height: 34px;
+    }
+    100% {
+      height: 15px;
+    }
+  }
+  @-o-keyframes pump-it-up1 {
+    40% {
+      height: 32px;
+    }
+    60% {
+      height: 22px;
+    }
+    80% {
+      height: 48px;
+    }
+    100% {
+      height: 40px;
+    }
+  }
+  @keyframes pump-it-up1 {
+    40% {
+      height: 2px;
+    }
+    60% {
+      height: 24px;
+    }
+    80% {
+      height: 25px;
+    }
+    100% {
+      height: 9px;
+    }
+  }
+  @-webkit-keyframes pump-it-up2 {
+    40% {
+      height: 10px;
+    }
+    60% {
+      height: 36px;
+    }
+    80% {
+      height: 20px;
+    }
+    100% {
+      height: 24px;
+    }
+  }
+  @-moz-keyframes pump-it-up2 {
+    40% {
+      height: 25px;
+    }
+    60% {
+      height: 46px;
+    }
+    80% {
+      height: 27px;
+    }
+    100% {
+      height: 38px;
+    }
+  }
+  @-o-keyframes pump-it-up2 {
+    40% {
+      height: 40px;
+    }
+    60% {
+      height: 2px;
+    }
+    80% {
+      height: 25px;
+    }
+    100% {
+      height: 38px;
+    }
+  }
+  @keyframes pump-it-up2 {
+    40% {
+      height: 44px;
+    }
+    60% {
+      height: 41px;
+    }
+    80% {
+      height: 10px;
+    }
+    100% {
+      height: 14px;
+    }
+  }
+  @-webkit-keyframes pump-it-up3 {
+    40% {
+      height: 7px;
+    }
+    60% {
+      height: 1px;
+    }
+    80% {
+      height: 40px;
+    }
+    100% {
+      height: 24px;
+    }
+  }
+  @-moz-keyframes pump-it-up3 {
+    40% {
+      height: 42px;
+    }
+    60% {
+      height: 43px;
+    }
+    80% {
+      height: 3px;
+    }
+    100% {
+      height: 26px;
+    }
+  }
+  @-o-keyframes pump-it-up3 {
+    40% {
+      height: 38px;
+    }
+    60% {
+      height: 7px;
+    }
+    80% {
+      height: 15px;
+    }
+    100% {
+      height: 34px;
+    }
+  }
+  @keyframes pump-it-up3 {
+    40% {
+      height: 32px;
+    }
+    60% {
+      height: 24px;
+    }
+    80% {
+      height: 34px;
+    }
+    100% {
+      height: 23px;
+    }
+  }
+  @-webkit-keyframes pump-it-up4 {
+    40% {
+      height: 32px;
+    }
+    60% {
+      height: 9px;
+    }
+    80% {
+      height: 7px;
+    }
+    100% {
+      height: 29px;
+    }
+  }
+  @-moz-keyframes pump-it-up4 {
+    40% {
+      height: 41px;
+    }
+    60% {
+      height: 27px;
+    }
+    80% {
+      height: 14px;
+    }
+    100% {
+      height: 27px;
+    }
+  }
+  @-o-keyframes pump-it-up4 {
+    40% {
+      height: 27px;
+    }
+    60% {
+      height: 42px;
+    }
+    80% {
+      height: 36px;
+    }
+    100% {
+      height: 10px;
+    }
+  }
+  @keyframes pump-it-up4 {
+    40% {
+      height: 2px;
+    }
+    60% {
+      height: 12px;
+    }
+    80% {
+      height: 12px;
+    }
+    100% {
+      height: 4px;
+    }
+  }
+  
+
+  main {
+    width: 100%;
+    height: 100%;
+  }
+  main #levels {
+    width: 100px;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 auto;
+    position: relative;
+  }
+  main #levels .level {
+    width: 3px;
+    height: 50px;
+    margin-left: 1px;
+    display: inline-block;
+    position: relative;
+  }
+  main #levels .level:after {
+    content: " ";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #FFF;
+    width: 3px;
+  }
+  main #levels .level.level1:after {
+    height: 16px;
+    animation: pump-it-up1 631ms linear infinite alternate;
+  }
+  main #levels .level.level2:after {
+    height: 9px;
+    animation: pump-it-up2 472ms linear infinite alternate;
+  }
+  main #levels .level.level3:after {
+    height: 35px;
+    animation: pump-it-up3 722ms linear infinite alternate;
+  }
+  main #levels .level.level4:after {
+    height: 6px;
+    animation: pump-it-up4 647ms linear infinite alternate;
+  }

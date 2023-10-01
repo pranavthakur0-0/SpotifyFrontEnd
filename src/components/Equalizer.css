@@ -1,0 +1,125 @@
+.equalizer{
+    display: block;
+    width:1.5rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: 0;
+    position: relative;
+    transition: opacity 0.5s ease;
+  }
+
+  .equalizer div{
+    width:  15px;
+    height: 15px;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: 0;
+    position: relative;
+    transition: opacity 0.5s ease;
+  }
+
+  
+  
+  .equalizer:hover, .equalizer:focus{
+    outline: 0;
+    opacity: 0.5;
+  }
+  
+  .equalizer span{
+    display: inline-block;
+    width: 2px;
+    background-color: var(--green);
+    position: absolute;
+    bottom: 0;
+  }
+  
+  @keyframes shorteq{
+    0% {height: 10px}
+    50% {height: 5px}
+    100% {height: 10px}
+  }
+  @-webkit-keyframes shorteq{
+    0% {height: 10px}
+    50% {height: 5px}
+    100% {height: 10px}
+  }
+  
+  @keyframes talleq{
+    0% {height: 15px}
+    50% {height: 8px}
+    100% {height: 15px}
+  }
+  @-webkit-keyframes talleq{
+    0% {height: 15px}
+    50% {height: 5px}
+    100% {height: 15px}
+  }
+  
+  @keyframes tall2eq{
+    0% {height: 12px}
+    50% {height: 2px}
+    100% {height: 15px}
+  }
+  @-webkit-keyframes tall2eq{
+    0% {height: 12px}
+    50% {height: 2px}
+    100% {height: 15px}
+  }
+  
+  
+  .eq1{
+    height: 13px;
+    left: 0;
+    animation-name: shorteq;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-delay: 0s;
+    -webkit-animation-name: shorteq;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-iteration-count: infinite;
+    animation-delay: 0s;
+  }
+  
+  .eq2{
+    height: 15px;
+    left: 3px;
+    animation-name: talleq;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-delay: 0.2s;
+    -webkit-animation-name: talleq;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-iteration-count: infinite;
+    animation-delay: 0.17s;
+  }
+  
+  .eq3{
+    height: 13px;
+    left: 6px;
+    animation-name: shorteq;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-delay: 0s;
+    -webkit-animation-name: shorteq;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-iteration-count: infinite;
+  }
+  .eq4{
+    height: 5px;
+    left: 9px;
+    animation-name: tall2eq;
+    animation-duration: 0.6s;
+    animation-iteration-count: infinite;
+    animation-delay: 0s;
+    -webkit-animation-name: tall2eq;
+    -webkit-animation-duration: 0.6s;
+    -webkit-animation-iteration-count: infinite;
+  }
+  

@@ -1,0 +1,278 @@
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+@layer base {
+  @font-face {
+    font-family: "Spotify";
+    src: url(./Circular/CircularStd-Light.otf);
+  }
+  /* @font-face {
+    font-family: "Spotify Medium";
+    src: url(./Circular/CircularStd-Medium.otf);
+  }
+  @font-face {
+    font-family: "Spotify Bold";
+    src: url(./Circular/CircularStd-Bold.otf);
+  } 
+  
+
+
+} 
+*/
+@layer base {
+  @font-face {
+    font-family: "spotify-light";
+    src: url(./Circular/CircularStd-Light.otf) format('opentype');
+  }
+  @font-face {
+    font-family: "spotify-book";
+    src: url(./Circular/CircularStd-Book.otf);
+  }
+  @font-face {
+    font-family: "spotify";
+    src: url(./Circular/CircularStd-Medium.otf);
+  }
+  @font-face {
+    font-family: "spotify-bold";
+    src: url(./Circular/CircularStd-Bold.otf) format('opentype');
+    font-weight: 700; /* Bold font weight */
+  }
+  @font-face {
+    font-family: "spotify-black";
+    src: url(./Circular/CircularStd-Black.otf) format('opentype');
+  }
+  body {
+    font-family: "spotify";
+  }
+}
+
+html {
+  background-color: black;
+}
+
+:root {
+  --green: #1ed760;
+  --red: #e91429;
+  --dark-text : #b3b3b3;
+  --dark-text-placeholder : #818181;
+  --background-base: #121212;
+  --primary-background-highlight: #1fdf64;
+  --absent-background :  #ffffff25;
+  --absent-background-input :  #343434;
+  --background-highlight: #1a1a1a;
+  --text-subdued: #a7a7a7;
+  --text-negative: #f15e6c;
+  --text-warning : #ffa42b;
+  --text-announcement: #3d91f4;
+  --essential-announcement: #0d72ea;
+  --essential-subdued: #727272;
+  --essential-warning: #ffa42b;
+  --decorative-subdued: #292929;
+  --essential-bright-accent: #169b45;
+  --background-elevated-base: #242424;
+  --home-card : #181818;
+  --home-card-hover : #282828;
+  --track-list : #8a8a8a45;
+  --track-list-playing : #3e3e3e;
+  --hover-main-search : #242424;
+  --playlist-container : #282828;
+  --login-required-sidebar: #0d72ea;
+  --background-tinted-playlist: rgba(255, 255, 255, 0.05);
+  --background-tinted-base: #ffffff12;
+  --background-dark-tinted: #00000090;
+  --column-count: 2;
+  --grid-gap: 24px;
+  --min-container-width: 372px;
+
+  
+  --background-noise: url(./images/download.svg);
+}
+@layer base {
+  :root {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: inherit;
+  }
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("./images/down-arrow.png");
+  background-repeat: no-repeat;
+  background-position: calc(100% + -0.4rem);
+  background-size: 1.3rem;
+}
+
+input::-moz-placeholder {
+  color: #797979;
+  opacity: 1;
+}
+input:-ms-input-placeholder {
+  color: #797979;
+}
+input::-webkit-input-placeholder {
+  color: #797979;
+}
+
+.specifyColor {
+  width: 1px;
+}
+
+
+.image-mix-blend{
+  background-image: -webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.6)),to(var(--background-base))),var(--background-noise);
+  background-image: linear-gradient(rgba(0,0,0,.6) 0,var(--background-base) 100%),var(--background-noise);
+}
+.home-default{
+  background: rgb(255,255,255);
+  background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(241, 241, 241, 0.058) 100%);
+}
+.home_default_grid {
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+}
+
+.my_scroll_div{
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.disable-scroll {
+  overflow-y: hidden; /* Disable vertical scrolling */
+  overflow-x: hidden; /* Disable horizontal scrolling */
+}
+
+
+.my_scroll_div_X_not_hidden{
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+
+.backgroundOverlay{
+  background: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
+}
+
+
+.music-grid {
+  display: grid;
+  grid-template-columns: [index] 1.5rem [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px, 1fr);
+  gap: 1rem;
+}
+
+.music-grid-home {
+  display: grid;
+  grid-template-columns: [index] 0rem [first] 2fr [last] minmax(50px, 100px);
+  gap: 0rem;
+}
+
+.music-grid-span {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Prevent the text from wrapping */
+}
+
+@media  (max-width: 768px) {
+  .music-grid{
+    grid-template-columns: [index] 20px [first] 4fr [last] minmax(90px,60px);
+  }
+
+}
+
+
+.fade-in {
+  opacity: 0;
+  animation: fade-in 0.2s ease-in forwards;
+}
+
+@keyframes fade-in {
+  100% {
+    opacity: 1;
+  }
+}
+
+button:hover .fade-in-text {
+  opacity: 1;
+}
+
+
+
+.fade-out {
+  opacity: 1;
+  animation-delay: s;
+  animation: fade-in 2s ease-out forwards;
+}
+
+@keyframes fade-in {
+  100% {
+    opacity: 0;
+  }
+}
+
+.fade-in-out {
+  opacity: 0;
+  animation: fade-in 4s ease-out forwards;
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0.1;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.faded-in {
+  display: none;
+}
+
+.fade-in-text:hover .faded-in {
+  display: block;
+  opacity: 0;
+  animation: faded-in-text 0.3s ease-in-out forwards;
+  transition: opacity 0.2s ease-in-out;
+}
+
+@keyframes faded-in-text {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+.triangle-left {
+	width: 0;
+	height: 0;
+	border-top: 8px solid transparent;
+	border-right: 12px solid var(--login-required-sidebar);
+	border-bottom: 8px solid transparent;
+}
+

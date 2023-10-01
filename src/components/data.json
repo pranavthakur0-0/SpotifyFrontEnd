@@ -1,0 +1,120 @@
+[
+    {
+      "id" : "1",
+      "title": "Focus",
+      "playlist" : [{
+        "id" : "1",
+        "title" : "Peaceful Piano",
+        "desciption" : "Peaceful piano to help you slow down, breathe, and relax. ",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002d073e656e546e43bc387ad79"
+      },
+      {
+        "id" : "2",
+        "title" : "Deep Focus",
+        "desciption" : "Keep calm and focus with ambient and post-rock music.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002d6d48b11fd3b11da654c3519"
+      },
+      {
+        "id" : "3",
+        "title" : "Instrumental Study",
+        "desciption" : "Focus with soft study music in the background.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002fe24d7084be472288cd6ee6c"
+      },
+      {
+        "id" : "4",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      },
+      {
+        "id" : "5",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      },
+      {
+        "id" : "6",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      },{
+        "id" : "1",
+        "title" : "Peaceful Piano",
+        "desciption" : "Peaceful piano to help you slow down, breathe, and relax. ",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002d073e656e546e43bc387ad79"
+      },
+      {
+        "id" : "2",
+        "title" : "Deep Focus",
+        "desciption" : "Keep calm and focus with ambient and post-rock music.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002d6d48b11fd3b11da654c3519"
+      },
+      {
+        "id" : "3",
+        "title" : "Instrumental Study",
+        "desciption" : "Focus with soft study music in the background.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002fe24d7084be472288cd6ee6c"
+      },
+      {
+        "id" : "4",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      },
+      {
+        "id" : "5",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      },
+      {
+        "id" : "6",
+        "title" : "Focus Flow",
+        "desciption" : "Uptempo instrumental hip hop beats.",
+        "imgage" : "https://i.scdn.co/image/ab67706f00000002724554ed6bed6f051d9b0bfc"
+      }]
+    },
+    {
+       "id" : "2",
+        "title": "Pranav Thakur Playlist's",
+        "playlist" : [{
+          "title" : "Peaceful Piano",
+          "desciption" : "Peaceful piano to help you slow down, breathe, and relax. ",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002d073e656e546e43bc387ad79"
+        },
+        {
+          "id" : "1",
+          "title" : "Deep Focus",
+          "desciption" : "Keep calm and focus with ambient and post-rock music.",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002d6d48b11fd3b11da654c3519"
+        },
+        {
+          "id" : "2",
+          "title" : "Instrumental Study",
+          "desciption" : "Focus with soft study music in the background.",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002fe24d7084be472288cd6ee6c"
+        }]
+      },
+      {
+        "id" : "3",
+        "title": "Pranav Thakur Playlist's",
+        "playlist" : [{
+          "id" : "1",
+          "title" : "Peaceful Piano",
+          "desciption" : "Peaceful piano to help you slow down, breathe, and relax. ",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002d073e656e546e43bc387ad79"
+        },
+        {
+          "id" : "2",
+          "title" : "Deep Focus",
+          "desciption" : "Keep calm and focus with ambient and post-rock music.",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002d6d48b11fd3b11da654c3519"
+        },
+        {
+          "id" : "3",
+          "title" : "Instrumental Study",
+          "desciption" : "Focus with soft study music in the background.",
+          "imgage" : "https://i.scdn.co/image/ab67706f00000002fe24d7084be472288cd6ee6c"
+        }]
+      }
+  ]
