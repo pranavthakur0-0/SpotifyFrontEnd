@@ -9,8 +9,7 @@ export const makeUnauthenticatedPostRequest = async (route, body)=>{
         },
         body : JSON.stringify(body),
     });
-    const formattedResponse = await response.json();
-    return formattedResponse;
+    return  response;
 }
 
 

@@ -2,38 +2,51 @@ import { useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { makeUnauthenticatedPostRequest } from '../utils/ServerHelpers';
+import "./Login.css"
 export default function Login(){
     const [info, setinfo] = useState({
         email : "",
         password : "",
         rememberMe : true,
     });
+    const [error , seterror] = useState();
     const navigate = useNavigate();
     const [,setCookie] = useCookies(['userId']);
     const handleChange = async (e) => {
             e.preventDefault();
-            const response = await makeUnauthenticatedPostRequest('/auth/login', info);
-            if(response){
-                console.log(response);
-                setinfo(info=>({
-                    email : "",
-                    password : "",
-                    rememberMe : true,
-                }))
-                const expires = new Date(response.date);
-                if (expires instanceof Date && !isNaN(expires)) {
-                  // Valid date
-                  setCookie("userId", response.token, { path: '/', expires });
-                } else {
-                  // Invalid date
-                  console.log("Invaliddddd")
-                  setCookie("userId", response.token, { path: '/', expires: 0 });
-                }     
-                navigate("/");     
+            try{
+                const response = await makeUnauthenticatedPostRequest('/auth/login', info);
+                if(response.status === 200){
+                    const res = await response.json();
+                    setinfo(info=>({
+                        email : "",
+                        password : "",
+                        rememberMe : true,
+                    }))
+                    const expires = new Date(res.date);
+                    if (expires instanceof Date && !isNaN(expires)) {
+                      setCookie("userId", res.token, { path: '/', expires });
+                    } else {
+                      setCookie("userId", res.token, { path: '/', expires: 0 });
+                    }     
+                    navigate("/");     
+                }else{
+                    seterror(true);
+                        setinfo(info=>({
+                        email : "",
+                        password : "",
+                        rememberMe : true,
+                    }))
+                    
+                }
+            }
+            catch(err){
+                console.log(err);
             }
     };
 
     const setdata = (e)=>{
+        seterror(false);
         setinfo((info)=>({
             ...info,
             [e.target.name] : e.target.value
@@ -50,17 +63,20 @@ export default function Login(){
                 <form onSubmit={handleChange} className="bg-black">
                     <div className="w-full  flex justify-center items-center md:bg-black py-1  md:py-20 md:bg-gradient-to-b from-white/10 to-black">
                         <div className="flex flex-col max-w-[734px] flex-1 bg-black justify-center items-center py-6 pb-20 md:py-20">
-                        <div className="p-6 bg-black text-white w-fit">
-                          <div className="text-[2.3rem] tracking-tight md:text-[3rem]" style={{fontFamily : "Spotify-bold"}}>Log in to Spotify</div>
+                        <div className="p-6 bg-black text-white w-full md:w-fit">
+                          <div className="text-[2.3rem] tracking-tight md:text-[3rem] text-center" style={{fontFamily : "Spotify-bold"}}>Log in to Spotify</div>
+                            {error ? <div className='mt-4 bg-[var(--bg-negative)] flex justify-center gap-3 p-3'><svg role="img" height="24" width="24" aria-hidden="false" aria-label="Error:" className='fill-white' viewBox="0 0 24 24" data-encore-id="icon"><title>Error:</title><path d="M11 18v-2h2v2h-2zm0-4V6h2v8h-2z"></path><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12z"></path></svg>Incorrect username or password.</div> : ""}
                           <div>
-                                <div className="flex flex-col pt-6">
+                                <div className="flex flex-col pt-6 flex-1">
                                     <label htmlFor="" className="font-light text-sm pb-1">Email or Username</label>
-                                    <input onChange={setdata} value={info.email} style={{fontFamily : "spotify-book"}} type="text" id='email' name='email' placeholder="Email or Username" autoComplete='off' className="h-12 rounded-[3px] bg-[#121212] p-2 shadow-[0px_0px_0px_0.5px_rgba(255,255,255,0.8)] outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(255,255,255,1)] hover:shadow-[0px_0px_0px_1px_rgba(255,255,255,1)] transition-all ease-in-out" />
+                                    <input onChange={setdata} value={info.email} style={{fontFamily : "spotify-book"}} type="text" id='email' name='email' placeholder="Email or Username" autoComplete='off' 
+                                    className={`h-12 rounded-[3px] bg-[#121212] p-2 ${error ? "shadow-[0px_0px_0px_0.5px_rgba(233,20,41,1)]" : "shadow-[0px_0px_0px_0.5px_rgba(255,255,255,0.8)]"} outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(255,255,255,1)] ${error ? "hover:shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : "hover:shadow-[0px_0px_0px_2px_rgba(255,255,255,1)]"} transition-all ease-in-out`} />
                                 </div>
                              
                                 <div className="flex flex-col pt-6">
                                     <label htmlFor="" className="font-light text-sm pb-1">Password</label>
-                                    <input onChange={setdata} value={info.password} style={{fontFamily : "spotify-book"}} type="password" id='password' name='password' placeholder="Password" className="h-12 rounded-[3px] bg-[#121212] p-2 shadow-[0px_0px_0px_0.5px_rgba(255,255,255,0.8)] outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(255,255,255,1)] hover:shadow-[0px_0px_0px_1px_rgba(255,255,255,1)] transition-all ease-in-out" />
+                                    <input onChange={setdata} value={info.password} style={{fontFamily : "spotify-book"}} type="password" id='password' name='password' placeholder="Password"
+                                    className={`h-12 rounded-[3px] bg-[#121212] p-2 ${error ? "shadow-[0px_0px_0px_0.5px_rgba(233,20,41,1)]" : "shadow-[0px_0px_0px_0.5px_rgba(255,255,255,0.8)]"} outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(255,255,255,1)] ${error ? "hover:shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : "hover:shadow-[0px_0px_0px_2px_rgba(255,255,255,1)]"} transition-all ease-in-out`} />
                                 </div> 
                                 <div className="mt-6 flex gap-[2.3rem] relative">
                                     <input id="check-apple" type="checkbox" className='h-[0px]'

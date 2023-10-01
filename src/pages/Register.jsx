@@ -3,30 +3,50 @@ import { FaCheck } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineEye , AiOutlineEyeInvisible} from "react-icons/ai";
 import { makeUnauthenticatedPostRequest } from "../utils/ServerHelpers";
+
+
 export default function Register(){
     const monthSelectRef = useRef(null);
     const [hide, sethide] = useState(false);
     const navigate = useNavigate();
-    const [info, setinfo] = useState({
+    const initialInfo = {
         email: "",
         password: "",
-        username : "",
-        date : "",
-        month : "",
+        username: "",
+        date: "",
+        month: "",
         year: "",
-        gender : "",
-        marketing : "",
-        data : "",
-    });
+        gender: "",
+        marketing: "",
+        data: "",
+      };
+      
+    const [info, setinfo] = useState(initialInfo);
 
-    const setdata = (e)=>{
-        setinfo((info)=>({
-            ...info,
-            [e.target.name] : e.target.value
-        }))
-        console.log(info);
-    }
+    const [errors, setErrors] = useState({
+        email: "",
+        password: "",
+        username: "",
+        date: "",
+        month: "",
+        year: "",
+        gender: "",
+      });
 
+      const setdata = (e) => {
+        const { name, value } = e.target;
+      
+        setinfo((info) => ({
+          ...info,
+          [name]: value,
+        }));
+      
+        // Remove the respective error for the field
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: undefined,
+        }));
+      };
     useEffect(()=>{
         var selectElement = document.getElementById('month');
         var selectedValue = selectElement.value;
@@ -48,27 +68,49 @@ export default function Register(){
         setdata(e);
       }
 
+
+      const validateForm = () => {
+        const newErrors = {};
+    
+        const requiredFields = ['email', 'password', 'username', 'date', 'month', 'year', 'gender'];
+    
+        requiredFields.forEach(field => {
+          if (!info[field]) {
+            newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+          } else if (field === 'email' && !/^\S+@\S+\.\S+$/.test(info.email)) {
+            newErrors.email = 'Invalid email address';
+          }
+        });
+    
+        setErrors(newErrors);
+        
+        return Object.keys(newErrors).length === 0;
+      };
+
+
+
       const handleChange = async (e)=>{
-        e.preventDefault()
+        e.preventDefault();
+        const isValid = validateForm();
+         if (!isValid) {
+           return;
+         }
+      
         const response = await makeUnauthenticatedPostRequest('/auth/register', info);
-        console.log(response);
-        if (response) {
-            setinfo((info) => ({
-              ...info,
-              email: "",
-              password: "",
-              username: "",
-              date: "",
-              month: "",
-              year: "",
-              gender: "",
-              marketing: "",
-              data: "",
-            }));
-          }      
-          monthSelectRef.current.selectedIndex = 0;
-          navigate("/login");  
+        if (response.status === 200) {
+            if (response.status === 200) {
+                setinfo(initialInfo);
+                setErrors({});
+                monthSelectRef.current.selectedIndex = 0;
+                navigate("/login");
+              }
+            }  
+
       }
+
+      useEffect(()=>{
+        console.log(errors);
+      },[errors])
 
     return (<>
             <main className="flex justify-center text-[0.9rem] bg-white" >
@@ -82,30 +124,33 @@ export default function Register(){
                         <form onSubmit={handleChange} className="flex flex-col gap-6">
                             <div>
                                 <label className="tracking-tight" htmlFor="email">What’s your email address?</label> <br />
-                                <input value={info.email} onChange={setdata} name="email" id="email" style={{fontFamily:"spotify-book "}} type="text" className="mt-1 w-full h-[45px] p-2 pl-3 rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" placeholder="Enter your email." />
+                                <input value={info.email} onChange={setdata} name="email" id="email" style={{fontFamily:"spotify-book "}} type="text" 
+                                className={`mt-1 w-full h-[45px] p-2 pl-3 rounded-sm ${errors.email ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" :  "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]" } focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]`} placeholder="Enter your email." />
                             </div>
                             <div>
                                 <label className="tracking-tight" htmlFor="password">Create a password</label> <br />
                                 <div className="relative">
                                     <div className="absolute top-[0.8rem] right-2 text-[1.8rem] cursor-pointer" onClick={e=>sethide(cur=>!cur)}>{hide ? <AiOutlineEyeInvisible /> :  <AiOutlineEye />}</div>
-                                <input value={info.password} onChange={setdata} id="password" name="password" style={{fontFamily:"spotify-book "}} type={ hide ? 'text' : "password"} className="mt-1 w-full h-[45px] p-2 pl-3 rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" placeholder="Create a password" />
+                                <input value={info.password} onChange={setdata} id="password" name="password" style={{fontFamily:"spotify-book "}} type={ hide ? 'text' : "password"} 
+                                className={`mt-1 w-full h-[45px] p-2 pl-3 rounded-sm ${errors.password ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]"} focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]`} placeholder="Create a password" />
                                 </div>
                             </div>
                             <div>
                                 <label className="tracking-tight" htmlFor="username">What should we call you?</label> <br />
-                                <input value={info.username} onChange={setdata} style={{fontFamily:"spotify-book "}} name="username" id="username" type="text" className="mt-1 w-full h-[45px] p-2 pl-3 rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" placeholder="Enter your profile name." />
+                                <input value={info.username} onChange={setdata} style={{fontFamily:"spotify-book "}} name="username" id="username" type="text" 
+                                className={`mt-1 w-full h-[45px] p-2 pl-3 rounded-sm ${errors.username ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]"} focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]`} placeholder="Enter your profile name." />
                             </div>
                            <div>
                             <label className="tracking-tight" htmlFor="">What's your date of birth?</label>
                             <div className="flex w-full gap-4">
                                 <div>
                                 <label className="tracking-tight" htmlFor="date">Date</label><br />
-                                <input value={info.date} onChange={setdata} id="date" name="date" style={{ fontFamily: "spotify-book" }} type="number" className="text-center mt-1 p-2 flex md:max-w-[70px] max-w-[50px] h-[45px] rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" placeholder="DD" />
-
+                                <input value={info.date} onChange={setdata} id="date" name="date" style={{ fontFamily: "spotify-book" }} type="number" className={`text-center mt-1 p-2 flex md:max-w-[70px] max-w-[50px] h-[45px] rounded-sm ${ errors.date ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]"  : "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]"  } focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]`}  placeholder="DD"></input>
                                 </div>
                                 <div style={{fontFamily:"spotify-book "}} className="w-full" >
                                 <label className="tracking-tight" htmlFor="">Month</label><br />
-                                <select ref={monthSelectRef} className="text-[var(--dark-text)] p-2 text-sm flex w-full h-[45px] mt-1 rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,0.8)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" name="month" id='month' onChange={e=>{show_month(e)}}>
+                                <select ref={monthSelectRef} 
+                                className={`text-[var(--dark-text)] p-2 text-sm flex w-full h-[45px] mt-1 rounded-sm ${ errors.month ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]"  : "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]"  } focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]"`} name="month" id='month' onChange={e=>{show_month(e)}}>
                                      <option defaultValue >Month</option>
                                      <option value='1'>Janaury</option>
                                      <option value='2'>February</option>
@@ -123,7 +168,8 @@ export default function Register(){
                                 </div>
                                 <div>
                                 <label className="tracking-tight" htmlFor="">Year</label><br />
-                                <input value={info.year} onChange={setdata} name="year" id="year" style={{fontFamily:"spotify-book "}} type="number" className="text-center mt-1 p-2 flex max-w-[60px] md:max-w-[100px] h-[45px] rounded-sm shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]" placeholder="YYYY" />
+                                <input value={info.year} onChange={setdata} name="year" id="year" style={{fontFamily:"spotify-book "}} type="number"
+                                 className={`text-center mt-1 p-2 flex max-w-[60px] md:max-w-[100px] h-[45px] rounded-sm ${errors.year ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : "shadow-[0px_0px_0px_0.8px_rgba(0,0,0,1)]"} focus:outline-none focus:shadow-[0px_0px_0px_1.5px_rgba(0,0,0,1)]`} placeholder="YYYY" />
                                 </div>
                             </div>
                            </div>
@@ -133,35 +179,35 @@ export default function Register(){
                                 <div className="flex items-center relative">
                                     <input onClick={setdata} className="mr-2.5 specifyColor" type="radio" id="male" name="gender" value="male" />
                                     <label htmlFor="male" className="pl-3 group">
-                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'male' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)]`}>
+                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'male' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)] ${errors.gender ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : null}`}>
                                             <div className={`w-[0.45rem] h-[0.45rem]  rounded-full bg-white`}></div>
                                         </div>Male</label>
                                 </div>
                                 <div className="flex items-center relative">
                                     <input onClick={setdata} className="mr-2.5 specifyColor" type="radio" id="female" name="gender" value="female" />
                                     <label htmlFor="female" className="pl-3 group">
-                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'female' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)]`}>
+                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'female' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)] ${errors.gender ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : null}`}>
                                             <div className={`w-[0.45rem] h-[0.45rem]  rounded-full bg-white`}></div>
                                         </div>Female</label>
                                 </div>
                                 <div className="flex items-center relative">
                                     <input onClick={setdata} className="mr-2.5 specifyColor" type="radio" id="non" name="gender" value="non" />
                                     <label htmlFor="non" className="pl-3 group">
-                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'non' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)]`}>
+                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'non' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)] ${errors.gender ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : null}`}>
                                             <div className={`w-[0.45rem] h-[0.45rem]  rounded-full bg-white`}></div>
                                         </div>Non-binary</label>
                                 </div>
                                 <div className="flex items-center relative">
                                     <input onClick={setdata} className="mr-2.5 specifyColor" type="radio" id="other" name="gender" value="other" />
                                     <label htmlFor="other" className="pl-3 group">
-                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'other' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)]`}>
+                                        <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px]   ${info.gender === 'other' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : "bg-slate-50 border-black/50"} group-hover:border-[var(--essential-bright-accent)] ${errors.gender ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : null}`}>
                                             <div className={`w-[0.45rem] h-[0.45rem]  rounded-full bg-white`}></div>
                                         </div>Other</label>
                                 </div>
                                 <div className="flex items-center relative">
                                     <input onClick={setdata} className="mr-2.5 specifyColor" type="radio" id="notsaid" name="gender" value="notsaid" />
                                     <label htmlFor="notsaid" className="pl-3 group">
-                                      <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px] ${info.gender === 'notsaid' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : 'bg-slate-50 border-black/50'} group-hover:border-[var(--essential-bright-accent)]`}>
+                                      <div className={`h-3.5 w-3.5 rounded-full absolute left-0 top-[0.18rem] flex justify-center items-center border-[1px] ${info.gender === 'notsaid' ? 'bg-[var(--essential-bright-accent)] border-[var(--essential-bright-accent)]' : 'bg-slate-50 border-black/50'} group-hover:border-[var(--essential-bright-accent)] ${errors.gender ? "shadow-[0px_0px_0px_2px_rgba(233,20,41,1)]" : null}`}>
                                         <div className="w-[0.45rem] h-[0.45rem] rounded-full bg-white"></div>
                                       </div>
                                       Prefer not to say
