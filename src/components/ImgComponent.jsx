@@ -4,7 +4,6 @@ import { memo, useContext, useEffect, useRef, useState } from "react"
 import HoverPlaylistThumbnail from "./HoverPlaylistThumbnail.jsx"
 import { NavbarContext } from "./Context";
 import { useMenu } from "../context/contextProvider.js";
-import { useSelector } from "react-redux";
 function ImgComponent ({playlist}){
     const {setNavcolor} = useContext(NavbarContext);
     const [compHeight, setcompHeight] = useState(0);
