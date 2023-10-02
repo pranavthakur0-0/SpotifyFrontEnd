@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import { useEffect, useRef} from "react";
 import SideBarHomeSearch from "../components/SideBarHomeSearch.jsx"
 import EmptyPlaylist from "./EmptyPlaylist.jsx"
@@ -9,7 +9,7 @@ import { authenticatedGetRequest } from "../utils/ServerHelpers.js";
 import PlaylistSidebar from "./PlaylistSidebar.jsx"
 import { useSideBar } from "../context/sidebarProvider.js";
 import { usePlaylist } from "../context/contextProvider.js";
-
+import { debounce } from "../utils/basicUtils.js";
 
 function Sidebar() {
   const screenWidth = useMemo(() => window.innerWidth , []);
@@ -21,18 +21,21 @@ function Sidebar() {
   const {Playlist} = usePlaylist();
   const { SideBarList } = useSideBar();
 
-  useEffect(() => {
-    async function fetchData() {
+// eslint-disable-next-line
+ const debouncedFetchData = useCallback(
+    debounce(async () => {
       const route = "/getUserplaylist";
       const response = await authenticatedGetRequest(route, Cookie);
       if (response) {
-         SideBarList.setlistInfo(response.playlistWithUsername);
+        SideBarList.setlistInfo(response.playlistWithUsername);
       }
-    }
-    fetchData();
+    }, 200),
+    [Cookie, Playlist.setlistInfo]
+  );
 
-    // eslint-disable-next-line
-  }, [Cookie, Playlist.setlistInfo]);
+  useEffect(() => {
+    debouncedFetchData();
+  }, [Cookie, debouncedFetchData]);
 
 
 

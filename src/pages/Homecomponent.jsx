@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 import DefaultHome from "../components/DefaultHome.jsx";
 import Section from "./Section.jsx";
 import Playlist from "../components/Playlist.jsx";
@@ -7,9 +7,6 @@ import { NavbarContext } from "../components/Context.jsx";
 import UploadSong from "./UploadSong.jsx";
 import LikedPlaylist from "./LikedPlaylist.jsx";
 import CreateAlbum from "../components/CreateAlbum.jsx";
-import { authenticatedGetRequest } from "../utils/ServerHelpers.js";
-import { useCookies } from "react-cookie";
-import { useSong } from "../context/contextProvider.js";
 import SearchMain from "./Search/SeachMain.jsx";
 import Footer from "../components/BasicComponent/Footer.jsx";
 import Navbar from "../components/Navbar.jsx";
@@ -22,7 +19,6 @@ function Homecomponent() {
    const [Navcolor, setNavcolor] = useState('');
    const [SongSearch, setSongSearch] = useState(null);
    const [mainRes, setmainRes] = useState(null);
-
    const renderComponent = React.useMemo(() => {
 
      if (location.pathname === "/" ) {
@@ -46,33 +42,12 @@ function Homecomponent() {
      return null;
      // eslint-disable-next-line 
    }, [location, login, SongSearch, mainRes]);
-  const { favList, favTracks } = useSong();
-  const [Cookie] = useCookies(['userId']);
 
-  const fetchData = useCallback(async () => {
-    const route = "/likedSong";
-    const response = await authenticatedGetRequest(route, Cookie);
-    favTracks.setLikeInfo(response.result);
-      // eslint-disable-next-line
-  }, [favList.favId]);
-  
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
 
-  const fetchDataLikedList = useCallback(async () => {
-    console.log("hello");
-    const route = "/likedSong";
-    const response = await authenticatedGetRequest(route, Cookie);
-    favTracks.setLikeInfo(response.result);
-      // eslint-disable-next-line
-  }, [favList.favId]);
-  
-  useEffect(() => {
-    fetchDataLikedList();
-          // eslint-disable-next-line
-  }, [favList.favId]);
+  // eslint-disable-next-line
+
+
+
 
   return (
      <NavbarContext.Provider value={{ scrollNav, setscrollNav, Navcolor, setNavcolor }}>

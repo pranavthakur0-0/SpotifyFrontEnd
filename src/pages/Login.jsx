@@ -37,7 +37,6 @@ export default function Login(){
                         password : "",
                         rememberMe : true,
                     }))
-                    
                 }
             }
             catch(err){

@@ -1,4 +1,4 @@
-import React, { memo,  useEffect, useRef } from "react";
+import React, { memo,  useCallback,  useEffect, useRef } from "react";
 import { useState } from "react";
 import SongList from "../components/SongList.jsx"
 import LikedPlaylisticon from "../images/liked-songs-640.png"
@@ -6,28 +6,30 @@ import { useSong, useUser } from "../context/contextProvider";
 import TwoClickMusicChanger from "../pattern/TwoClickMusicChanger.jsx"
 import DefaultHeading from "../pattern/DefaultHeading.jsx";
 import MainPlayListButton from "../pattern/MainPlayListButton.jsx";
+import { authenticatedGetRequest } from "../utils/ServerHelpers.js";
+import { debounce } from "../utils/basicUtils.js";
+import { useCookies } from "react-cookie";
 function LikedPlaylist(){
-  const [compHeight, setCompHeight] = useState(0);
   const { favList, favTracks } = useSong();
   const compRef = useRef(null);
   const [divWidth, setDivWidth] = useState(0);
   const { user } = useUser();
-  // const dispatch = useDispatch();
-
-
-  // useEffect(() => {
-  //   if (favTracks?.likeInfo) {
-  //   const data =  {
-  //       id: "collections",
-  //       songDetails: favTracks.likeInfo, // Ensure songDetails is an array
-  //     }
-  //     dispatch(setCurrentPlaylistDetails(data));
-  //   }
-  //   // eslint-disable-next-line
-  // }, [favTracks]);
-
+  const [Cookie,] = useCookies(['userId']);
+  // eslint-disable-next-line
+  const debouncedFetchDataLikedList = useCallback(
+    debounce(async () => {
+      const route = "/likedSong";
+      const response = await authenticatedGetRequest(route, Cookie);
+      console.log(response);
+      favTracks.setLikeInfo(response.result);
+    }, 200),
+    [Cookie, favList.favId]
+  );
   useEffect(() => {
-    setCompHeight(compRef.current?.clientHeight || 0);
+    if(Cookie){
+      debouncedFetchDataLikedList();
+    }
+     // eslint-disable-next-line
   }, []);
 
 
@@ -44,10 +46,12 @@ function LikedPlaylist(){
                     <p className="text-white text-sm pt-4 font-spotifyBook">{user && user.username ? user.username : null }</p> 
                     </div>
                     <div className="absolute h-full w-full top-0 backgroundOverlay left-0"></div>
-                    <div className="w-full h-48 image-mix-blend opacity-80 absolute z-10 left-0" style={{top : `${compHeight}px`, backgroundColor : '#5038A0'}}></div>
+
                 </div>
+
                 <div  className={` relative z-40 h-fit w-full`} >
                     <div className="p-6 flex gap-6 items-center">
+                    <div className="w-full h-48 image-mix-blend opacity-80 absolute top-0 left-0 -z-10 bg-[#5038A0]"></div>
                     {favList.favId && favList.favId.length > 0 ? <React.Fragment>
                       <MainPlayListButton currentPlaylist={{
                                   _id: "collections",
