@@ -1,7 +1,7 @@
 
 import { authenticatedPostRequest } from "../utils/ServerHelpers";
 
-export async function fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, playingTrack, setduration, sound, Cookie) {
+export async function fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, playingTrack, setduration, sound, Cookie) {
   try {
     // Create an AbortController and signal to allow cancellation
     const controller = new AbortController();
@@ -15,43 +15,61 @@ export async function fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainN
     // Store the controller to track the ongoing request
     fetchAndDecodeAudio.controller = controller;
 
+    const chunkSize = 1024 * 1024; // Adjust the chunk size as needed
 
-    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-
-    
-    stopAndResetAudioContext(sourceNodeRef);
-
-    const response = await fetch(playingTrack.track, { signal }); // Pass the signal to the fetch
-    const audioData = await response.arrayBuffer();
-    const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
-
-    // Check if this is still the latest request before proceeding
-    if (controller.signal.aborted) {
-      return;
+    // Initialize the audio context if not already created
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
 
+    // Initialize the source and gain nodes
     sourceNodeRef.current = audioContextRef.current.createBufferSource();
-    sourceNodeRef.current.buffer = audioBuffer;
-
     grainNodeRef.current = audioContextRef.current.createGain();
     grainNodeRef.current.connect(audioContextRef.current.destination);
     sourceNodeRef.current.connect(grainNodeRef.current);
     grainNodeRef.current.gain.setValueAtTime(sound, 0);
 
-    bufferRef.current = audioBuffer;
-    sourceNodeRef.current.start(audioContextRef.current.currentTime + 0);
-    setduration(audioBuffer.duration);
+    let offset = 0;
+    let duration = 0;
 
+    // Fetch and play audio in chunks
+    while (offset < playingTrack.duration) {
+      if (controller.signal.aborted) {
+        return;
+      }
 
-    if(Cookie){
-      const route = "/currentSong"
-      const body = playingTrack;
-      await authenticatedPostRequest(route, Cookie, body); 
+      const startByte = offset;
+      const endByte = Math.min(offset + chunkSize, playingTrack.duration);
+      const range = `bytes=${startByte}-${endByte}`;
+
+      const response = await fetch(playingTrack.track, {
+        headers: { Range: range },
+        signal,
+      });
+
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      const audioData = await response.arrayBuffer();
+      const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
+
+      sourceNodeRef.current.buffer = audioBuffer;
+
+      // Play the chunk
+      sourceNodeRef.current.start(audioContextRef.current.currentTime + duration);
+      duration += audioBuffer.duration;
+
+      offset = endByte + 1;
     }
-  
 
+    setduration(duration);
 
-
+    if (Cookie) {
+      const route = "/currentSong";
+      const body = playingTrack;
+      await authenticatedPostRequest(route, Cookie, body);
+    }
   } catch (error) {
     if (error.name !== 'AbortError') {
       console.error("Error loading or decoding audio", error);
@@ -60,13 +78,11 @@ export async function fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainN
 }
 
 
-
 export async function starterfetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, playingTrack, setduration, sound, Cookie, check) {
   try {
 
     audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     stopAndResetAudioContext(sourceNodeRef);
-
     const response = await fetch(playingTrack.track); // Pass the signal to the fetch
     const audioData = await response.arrayBuffer();
     const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
