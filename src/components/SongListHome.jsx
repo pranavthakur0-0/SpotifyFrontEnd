@@ -19,7 +19,7 @@ function SongListHome({item, index, divWidth, isFavorite, currentPlaylist}){
   const currentPlaylistofredux =  useSelector(state=>state.Songs.currentPlaylist);
     const [isHovered, setIsHovered] = useState(false);
     const { toastMessage, toastColor, toastBool } = useMenu();
-    const { audioContextRef, sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
+    const { audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
     const [Cookie,] = useCookies('userId');
     const { startedAt, setstartedAt, setduration, sound, setpaused, setCurrentTime } = useContext(TimeContext);
      // eslint-disable-next-line 
@@ -60,18 +60,18 @@ function SongListHome({item, index, divWidth, isFavorite, currentPlaylist}){
           dispatch(setCurrentPlaylistDetails(currentPlaylist));
           setCurrentTime(0);
           setstartedAt(0); 
-          fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
+          fetchAndDecodeAudio(audioContextRef, audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
           pauseAndPlay.setIsPlaying(true);
           setpaused(false);
           Stringify('paused', false);
    } else {
          if (pauseAndPlay.isPlaying) {
-           pauseAudio( audioContextRef, sourceNodeRef, setstartedAt, startedAt);
+           pauseAudio( audioContextRef,audioElementRef, sourceNodeRef, setstartedAt, startedAt);
            pauseAndPlay.setIsPlaying(false);
            setpaused(true);
            Stringify('paused', true);
          } else {
-           Playaudio( audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
+           Playaudio( audioContextRef, audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
            pauseAndPlay.setIsPlaying(true);
            setpaused(false);
            Stringify('paused', false);

@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import useMusicPlayerRefs from "./Refs/MusicRefs";
+import { parserGet, Stringify} from "../utils/StorageFun";
 
-export default function AdditionalMusicPlayerButton({sound, setsound}) {
+const volume = parserGet('volume');
+export default function AdditionalMusicPlayerButton() {
+  const {audioElementRef} = useMusicPlayerRefs();
+  const [sound, setsound] = useState(volume ? volume : 1);
+
   const soundbarRef = useRef();
   const isDraggingRef = useRef(false); // To track if the soundbar is being dragged
   const [hover, sethover] = useState();
@@ -8,9 +14,17 @@ export default function AdditionalMusicPlayerButton({sound, setsound}) {
   const handleSoundBar = (e) => {
     const position = e.clientX - soundbarRef.current.getBoundingClientRect().left;
     const width = soundbarRef.current.getBoundingClientRect().width;
-    const newSoundValue = Math.round((position / width) * 100);
-    setsound(newSoundValue/100);
+    const newSoundValue = Math.round((position / width) * 100) / 100;
+    setsound(newSoundValue);
   };
+  useEffect(()=>{
+
+    if (audioElementRef && audioElementRef.current) {
+      audioElementRef.current.volume = sound;
+    }
+    Stringify('volume', sound);
+    
+  },[sound, audioElementRef])
 
   const handleMouseDown = () => {
    

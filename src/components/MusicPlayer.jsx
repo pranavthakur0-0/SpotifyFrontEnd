@@ -3,7 +3,7 @@ import { authenticatedGetRequest } from "../utils/ServerHelpers";
 import { useCookies } from "react-cookie";
 import { useSong } from "../context/contextProvider";
 import {  starterfetchAndDecodeAudio } from "../MusicPlayer/MusicPlayer";
-import { PlayaudioPercent, stopAndResetAudioContext } from "../MusicPlayer/MusicPlayer";
+import { PlayaudioPercent } from "../MusicPlayer/MusicPlayer";
 import AdditonalMusicPlayerButton from "./AdditonalMusicPlayerButton.jsx"
 import SongDetailsBottomBar from "./SongDetailsBottomBar.jsx"
 import { Stringify, parserGet } from "../utils/StorageFun.js";
@@ -22,14 +22,13 @@ function MusicPlayer() {
     const previousQueue = useSelector(state=>state.Songs.previousQueue);
     const currentSong =  useSelector(state=>state.Songs.currentSong);
     const dispatch = useDispatch();
-    const { audioContextRef, sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
+    const { audioContextRef, audioElementRef,  sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
     const [loop, setloop] = useState(parserGet('LoopCondition') || false);
     const [Cookie,] = useCookies('userId');
     const { favList, songShuffle, songQueue, pauseAndPlay } = useSong();
-    const {startedAt, setstartedAt, duration, setduration, sound, paused, setsound} = useContext(TimeContext);
+    const {startedAt, setstartedAt, duration, setduration, sound, paused, setpaused, setsound} = useContext(TimeContext);
     const progressBarRef = useRef(null);
     const {currentTime, setCurrentTime} =  useContext(TimeContext);
-    const [progressBar, setprogressBar] = useState(null);
     const nextQueue = useSelector(state=>state.Songs.nextQueue);
     const fetchUserPref = async()=>{
       const route = "/userPref";
@@ -40,11 +39,6 @@ function MusicPlayer() {
         songShuffle.setShuffle(response.data.shuffle);
       }
     }
-
-
-    useEffect(()=>{
-      setprogressBar(currentTime);
-    },[currentTime])
 
 
 
@@ -58,10 +52,25 @@ function MusicPlayer() {
 
   const [effectHasRun, setEffectHasRun] = useState(true);
 
+
+  const buttonRef = useRef(null);
+
+  const handleButtonClick = () => {
+    // Handle the button click event
+    console.log('Button clicked');
+  };
+
+
   useEffect(() => {
     if(currentSong && effectHasRun){
+      if (buttonRef.current) {
+        buttonRef.current.click();
+        buttonRef.current.click();
+        buttonRef.current.click();
+        buttonRef.current.click();
+      }
       setEffectHasRun(false);
-      starterfetchAndDecodeAudio(audioContextRef,sourceNodeRef, grainNodeRef, bufferRef, currentSong, setduration, sound);
+      starterfetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, currentSong, setduration);
     } 
     // eslint-disable-next-line
   }, [currentSong]);
@@ -78,31 +87,38 @@ function MusicPlayer() {
     const progressBarfunction = (e)=>{
       const position = e.clientX- progressBarRef.current.getBoundingClientRect().left;
       const width = progressBarRef.current.getBoundingClientRect().width;
-      stopAndResetAudioContext(sourceNodeRef);
-      PlayaudioPercent(audioContextRef,sourceNodeRef,grainNodeRef, bufferRef, sound, pauseAndPlay, setstartedAt,(position/width)*100);
+      PlayaudioPercent(audioElementRef, (position/width)*100);
+      pauseAndPlay.setIsPlaying(true);
+      setpaused(false);
+      Stringify('paused', false);
     }
+
 
   
     useEffect(() => {
       // Update the currentTime continuously when the song is playing
       let animationFrameId;
-      console.log(nextQueue?.length);
       function updateCurrentTime() {
         if (pauseAndPlay.isPlaying) {
-          const currentTime = audioContextRef.current.currentTime - startedAt;
-          setprogressBar(currentTime);
-
-          if (currentTime >= bufferRef?.current?.duration && !loop && nextQueue?.length === 0 ) {
-            sourceNodeRef.current.loop = false;
-            setCurrentTime(0);
-            setstartedAt(0);
+          const currentTime = audioElementRef.current.currentTime;
+          setCurrentTime(currentTime);
+          const songEnd = audioElementRef?.current?.currentTime === audioElementRef?.current?.duration;
+          if (songEnd && !loop && nextQueue?.length === 0 ) {
             pauseAndPlay.setIsPlaying(false);
-          }else if(currentTime >= bufferRef?.current?.duration && !loop && nextQueue?.length > 0 ){
-            PlaynextFunction(dispatch, nextQueue, previousQueue, setCurrentTime, setstartedAt, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, setduration, sound, Cookie);
-          } else if(currentTime >= bufferRef?.current?.duration && loop){
             setCurrentTime(0);
-            setstartedAt(0);
-            PlayaudioPercent(audioContextRef,sourceNodeRef,grainNodeRef, bufferRef, sound, pauseAndPlay, setstartedAt, 0);
+            setpaused(true);
+            Stringify('paused', true);
+
+          }else if(songEnd && !loop && nextQueue?.length > 0 ){
+            PlaynextFunction(dispatch, nextQueue, previousQueue, setCurrentTime, setstartedAt, audioContextRef, audioElementRef,sourceNodeRef, grainNodeRef, bufferRef, setduration, sound, Cookie);
+          } else if(songEnd && loop){
+
+            setCurrentTime(0);
+            PlayaudioPercent(audioElementRef, 0);
+
+            pauseAndPlay.setIsPlaying(true);
+            setpaused(false);
+            Stringify('paused', false);
           } else {
             animationFrameId = requestAnimationFrame(updateCurrentTime);
           }
@@ -114,13 +130,6 @@ function MusicPlayer() {
     }, [pauseAndPlay.isPlaying, startedAt, loop, currentTime, paused]);
 
 
-    useEffect(()=>{
-      if(grainNodeRef.current){
-        grainNodeRef.current.gain.value = sound;
-      }
-      Stringify('volume', sound);
-        // eslint-disable-next-line
-    },[sound]);
 
 
 
@@ -146,6 +155,9 @@ function MusicPlayer() {
   <div className="w-[30%] min-w-fit flex items-center">
       {currentSong ? <SongDetailsBottomBar /> : null}
   </div>
+  <button ref={buttonRef} onClick={handleButtonClick} style={{ display: 'none' }}>
+        Hidden Button
+      </button>
           <div className="w-[40%] min-w-[400px] max-w-[722px] flex flex-col justify-center">
              <div className="flex gap-2">
 
@@ -167,8 +179,8 @@ function MusicPlayer() {
                    </div>
 
                         <MusicChnager item={currentSong}>
-                            <button className={`p-2 ${bufferRef.current ? "bg-white" : "bg-white/60"}  rounded-full gap-4 mb-2 h-fit relative group flex items-center justify-center fade-in-text hover:scale-105 transition-transform ease-in-out`}>
-                            <span className="hidden group-hover:block text-[0.8rem] absolute whitespace-nowrap -top-9   text-white p-[0.35rem] px-3 rounded-[0.2rem] font-spotifyBook tracking-wider rounded-sd bg-[--home-card-hover] faded-in">{!pauseAndPlay.isPlaying ? "Play" : "Pause"}</span>
+                            <button className={`p-2 ${audioElementRef?.current?.src && audioElementRef?.current?.readyState >= 2 ? "bg-white" : "bg-white/60"}  rounded-full gap-4 mb-2 h-fit relative group flex items-center justify-center fade-in-text hover:scale-105 transition-transform ease-in-out`}>
+                              <span className="hidden group-hover:block text-[0.8rem] absolute whitespace-nowrap -top-9   text-white p-[0.35rem] px-3 rounded-[0.2rem] font-spotifyBook tracking-wider rounded-sd bg-[--home-card-hover] faded-in">{!pauseAndPlay.isPlaying ? "Play" : "Pause"}</span>
                                {!pauseAndPlay?.isPlaying ?  <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"></path></svg> : <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"></path></svg>}
                             </button>
                         </MusicChnager>
@@ -201,12 +213,12 @@ function MusicPlayer() {
              { currentSong ? 
              <div className="flex gap-2 font-spotifyLight text-[0.6875rem] text-[--dark-text] items-center">
                   <div className="min-w-[40px] text-right">
-                  {formatTime(progressBar)}
+                  {formatTime(currentTime)}
                   </div>
                                
                   <div className="w-full h-[4px] bg-white/30 rounded-full relative group flex items-center">
                       <div className="h-[8px] cursor-pointer w-full absolute z-20" ref={progressBarRef} onClick={progressBarfunction} ></div>
-                      <div className="h-full group bg-white w-0 rounded-full flex justify-end items-center group-hover:bg-primary relative pl-2" style={{width : `${(progressBar/currentSong.duration)*100}%`}}>
+                      <div className="h-full group bg-white w-0 rounded-full flex justify-end items-center group-hover:bg-primary relative pl-2" style={{width : `${(currentTime/currentSong.duration)*100}%`}}>
                           <div className="h-[0.6rem] w-[0.6rem]  group-hover:block bg-white absolute rounded-full"></div>
                       </div>
                   </div>

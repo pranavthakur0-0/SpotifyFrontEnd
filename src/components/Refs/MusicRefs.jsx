@@ -4,12 +4,14 @@ const MusicPlayerRefsContext = createContext();
 
 export function MusicPlayerRefsProvider({ children }) {
   const audioContextRef = useRef(null);
+  const audioElementRef = useRef(null);
   const sourceNodeRef = useRef(null);
   const grainNodeRef = useRef(null);
   const bufferRef = useRef(null);
 
   const audioRefs = {
     audioContextRef,
+    audioElementRef,
     sourceNodeRef,
     grainNodeRef,
     bufferRef,

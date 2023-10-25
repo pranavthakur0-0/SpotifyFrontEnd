@@ -10,6 +10,7 @@ import { useSong } from "../context/contextProvider";
 export default function MainPlayListButton({currentPlaylist, ...props}){
     const {
         audioContextRef,
+        audioElementRef,
         sourceNodeRef,
         grainNodeRef,
         bufferRef
@@ -27,18 +28,18 @@ export default function MainPlayListButton({currentPlaylist, ...props}){
         setstartedAt(0); 
         dispatch(setCurrentPlaylist(currentPlaylist));
         const firstSong = currentPlaylist?.songDetails[0];
-        fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, firstSong, setduration, sound, Cookie);
+        fetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, firstSong, setduration, sound, Cookie);
         pauseAndPlay.setIsPlaying(true);
         setpaused(false);
         Stringify('paused', false);
       }else{
             if (pauseAndPlay.isPlaying) {
-              pauseAudio( audioContextRef, sourceNodeRef, setstartedAt, startedAt);
+              pauseAudio( audioContextRef,audioElementRef, sourceNodeRef, setstartedAt, startedAt);
               pauseAndPlay.setIsPlaying(false);
               setpaused(true);
               Stringify('paused', true);
             } else {
-              Playaudio( audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
+              Playaudio( audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
               pauseAndPlay.setIsPlaying(true);
               setpaused(false);
               Stringify('paused', false);

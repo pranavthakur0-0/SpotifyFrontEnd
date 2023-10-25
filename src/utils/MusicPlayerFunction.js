@@ -8,6 +8,7 @@ export const PlaynextFunction = (
     setCurrentTime,
     setStartedAt,
     audioContextRef,
+    audioElementRef,
     sourceNodeRef,
     grainNodeRef,
     bufferRef,
@@ -24,6 +25,7 @@ export const PlaynextFunction = (
     setStartedAt(0);
     fetchAndDecodeAudio(
         audioContextRef,
+        audioElementRef,
         sourceNodeRef,
         grainNodeRef,
         bufferRef,

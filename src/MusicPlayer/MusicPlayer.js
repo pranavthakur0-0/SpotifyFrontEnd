@@ -1,96 +1,122 @@
 
-import { authenticatedPostRequest } from "../utils/ServerHelpers";
+// import { authenticatedPostRequest } from "../utils/ServerHelpers";
 
-export async function fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, playingTrack, setduration, sound, Cookie) {
-  try {
-    // Create an AbortController and signal to allow cancellation
-    const controller = new AbortController();
-    const { signal } = controller;
+import { parserGet } from "../utils/StorageFun";
 
-    // If there's an ongoing request, cancel it
-    if (fetchAndDecodeAudio.controller) {
-      fetchAndDecodeAudio.controller.abort();
-    }
 
-    // Store the controller to track the ongoing request
-    fetchAndDecodeAudio.controller = controller;
+export async function fetchAndDecodeAudio(audioContextRef, audioElementRef,sourceNodeRef, grainNodeRef, bufferRef, playingTrack, setduration, sound, Cookie) {
+  // If there's an ongoing request, cancel it
+  if (fetchAndDecodeAudio.controller) {
+    fetchAndDecodeAudio.controller.abort();
+  }
+  
+  // Create an AbortController and signal to allow cancellation
+  const controller = new AbortController();
+  const { signal } = controller;
 
-    const chunkSize = 1024 * 1024; // Adjust the chunk size as needed
+  // Store the controller to track the ongoing request
+  fetchAndDecodeAudio.controller = controller;
 
-    // Initialize the audio context if not already created
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
+   audioElementRef.current = new Audio();
+  
+  // Check if there's an audio source playing, and if so, stop it and reset the context
+  if (audioContextRef.current) {
+    stopAndResetAudioContext(audioElementRef.current, sourceNodeRef);
+  }
 
-    // Initialize the source and gain nodes
-    sourceNodeRef.current = audioContextRef.current.createBufferSource();
-    grainNodeRef.current = audioContextRef.current.createGain();
-    grainNodeRef.current.connect(audioContextRef.current.destination);
-    sourceNodeRef.current.connect(grainNodeRef.current);
-    grainNodeRef.current.gain.setValueAtTime(sound, 0);
+  audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+  sourceNodeRef.current = audioContextRef.current.createMediaElementSource(audioElementRef.current);
+  sourceNodeRef.current.connect(audioContextRef.current.destination);
 
-    let offset = 0;
-    let duration = 0;
+  const url = playingTrack.track;
 
-    // Fetch and play audio in chunks
-    while (offset < playingTrack.duration) {
-      if (controller.signal.aborted) {
-        return;
-      }
-
-      const startByte = offset;
-      const endByte = Math.min(offset + chunkSize, playingTrack.duration);
-      const range = `bytes=${startByte}-${endByte}`;
-
-      const response = await fetch(playingTrack.track, {
-        headers: { Range: range },
-        signal,
+  fetch(url, { signal })
+    .then(response => response.body)
+    .then(body => {
+      const reader = body.getReader();
+      return new ReadableStream({
+        start(controller) {
+          function pump() {
+            return reader.read().then(({ done, value }) => {
+              if (done) {
+                controller.close();
+              } else {
+                controller.enqueue(value);
+                pump();
+              }
+            });
+          }
+          pump();
+        }
       });
-
-      if (controller.signal.aborted) {
+    })
+    .then(stream => new Response(stream))
+    .then(response => response.blob())
+    .then(blob => {
+      const objectURL = URL.createObjectURL(blob);
+      audioElementRef.current.src = objectURL;
+      setduration(playingTrack.duration);
+      // Start playing as soon as enough data is available
+      const sound = parserGet('volume');
+      audioElementRef.current.volume =  sound ? sound : 1 ;
+      audioElementRef.current.play();
+    })
+    .catch(error => {
+      // Ignore abort errors as they are expected
+      if (error.name === 'AbortError') {
         return;
-      }
-
-      const audioData = await response.arrayBuffer();
-      const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
-
-      sourceNodeRef.current.buffer = audioBuffer;
-
-      // Play the chunk
-      sourceNodeRef.current.start(audioContextRef.current.currentTime + duration);
-      duration += audioBuffer.duration;
-
-      offset = endByte + 1;
-    }
-
-    setduration(duration);
-
-    if (Cookie) {
-      const route = "/currentSong";
-      const body = playingTrack;
-      await authenticatedPostRequest(route, Cookie, body);
-    }
-  } catch (error) {
-    if (error.name !== 'AbortError') {
-      console.error("Error loading or decoding audio", error);
-    }
-  }
+      }  
+      console.error('Error streaming audio:', error);
+    });
 }
 
 
 
-export async function starterfetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, playingTrack, setduration, sound, Cookie, check) {
+export async function starterfetchAndDecodeAudio(audioContextRef, audioElementRef, sourceNodeRef, playingTrack, setduration) {
   try {
-
+    // Set up the audio context and elements
     audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    stopAndResetAudioContext(sourceNodeRef);
+    audioElementRef.current = new Audio();
+    sourceNodeRef.current = audioContextRef.current.createMediaElementSource(audioElementRef.current);
+    sourceNodeRef.current.connect(audioContextRef.current.destination);
 
-    const response = await fetch(playingTrack.track); // Pass the signal to the fetch
-    const audioData = await response.arrayBuffer();
-    const audioBuffer = await audioContextRef.current.decodeAudioData(audioData);
-    bufferRef.current = audioBuffer;
-    setduration(audioBuffer.duration);
-    
+    // Fetch and decode the audio
+    fetch(playingTrack?.track)
+      .then(response => response.body)
+      .then(body => {
+        const reader = body.getReader();
+        return new ReadableStream({
+          start(controller) {
+            function pump() {
+              return reader.read().then(({ done, value }) => {
+                if (done) {
+                  controller.close();
+                } else {
+                  controller.enqueue(value);
+                  pump();
+                }
+              });
+            }
+            pump();
+          }
+        });
+      })
+      .then(stream => new Response(stream))
+      .then(response => response.blob())
+      .then(blob => {
+        const objectURL = URL.createObjectURL(blob);
+        audioElementRef.current.src = objectURL;
+
+        // Attach an event listener for when the audio is ready to play
+        audioElementRef.current.oncanplaythrough = () => {
+          setduration(playingTrack.duration);
+        };
+      })
+      .catch(error => {
+        if (error.name !== 'AbortError') {
+          console.error("Error loading or decoding audio", error);
+        }
+      });
   } catch (error) {
     if (error.name !== 'AbortError') {
       console.error("Error loading or decoding audio", error);
@@ -99,78 +125,50 @@ export async function starterfetchAndDecodeAudio(audioContextRef, sourceNodeRef,
 }
 
 
-export function stopAndResetAudioContext(sourceNodeRef) {
-  if (sourceNodeRef.current) {
-    sourceNodeRef.current.stop();
-    sourceNodeRef.current.disconnect();
-    sourceNodeRef.current = null;
+
+
+
+export function Playaudio(audioContextRef, audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, setstartedAt, startTime = 0) {
+  const sound = parserGet('volume');
+  audioElementRef.current.volume = sound ? sound : 1;
+
+  if (audioElementRef.current?.src) {
+    audioElementRef.current.play().catch(error => {
+      console.error("Playback cannot be started yet", error);
+    });
   }
 }
 
 
+export function stopAndResetAudioContext(audioElement, sourceNodeRef) {
+  if (audioElement) {
+    audioElement.pause();
+    audioElement.currentTime = 0;
+  }
 
- export function Playaudio(audioContextRef,sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startTime = 0) {
-     if (bufferRef.current) {
-         const currentTime = audioContextRef.current.currentTime;
-         stopAndResetAudioContext(sourceNodeRef);
-         
-         audioContextRef.current.resume();
+  if (sourceNodeRef.current) {
+    sourceNodeRef.current.disconnect();
+  }
+}
 
-         sourceNodeRef.current = audioContextRef.current.createBufferSource();
-         sourceNodeRef.current.buffer = bufferRef.current;
-         // Create the gain node
-         grainNodeRef.current = audioContextRef.current.createGain();
-         grainNodeRef.current.connect(audioContextRef.current.destination);
-         sourceNodeRef.current.connect(grainNodeRef.current);
-         // Start with full volume (gain value of 1)
-         grainNodeRef.current.gain.setValueAtTime(sound, 0);
-         // Define the time over which to decrease the volume (e.g., 1 second)
-        
-         
-         sourceNodeRef.current.start(0, Math.abs(startTime));
-         setstartedAt(currentTime - Math.abs(startTime));
-     }
- }
 
 
        
- export function pauseAudio(audioContextRef, sourceNodeRef, setstartedAt, startedAt) {
-  
-    if (sourceNodeRef.current) {
-      const currentTime = audioContextRef.current.currentTime;
-      sourceNodeRef.current.stop();
-      sourceNodeRef.current = null; // Reset the reference to the AudioBufferSourceNode
-      setstartedAt(currentTime - startedAt); // Update the startedAt time to account for the elapsed time
-      audioContextRef.current.suspend();
-    }
+ export function pauseAudio(audioContextRef,audioElementRef, sourceNodeRef, setstartedAt, startedAt) {
+    audioElementRef.current.pause();
   }
 
 
-  function createSourceNodeContext(audioContextRef,sourceNodeRef,grainNodeRef, audioBuffer, sound){
-
-    sourceNodeRef.current = null;
-    sourceNodeRef.current = audioContextRef.current.createBufferSource();
-    sourceNodeRef.current.buffer = audioBuffer;
-    // Create the gain node
-    grainNodeRef.current = audioContextRef.current.createGain();
-    grainNodeRef.current.connect(audioContextRef.current.destination);
-    sourceNodeRef.current.connect(grainNodeRef.current);
-    // Start with full volume (gain value of 1)
-    grainNodeRef.current.gain.setValueAtTime(sound, 0);
-
-  }
-
-
- export function PlayaudioPercent(audioContextRef,sourceNodeRef, grainNodeRef, bufferRef, sound, pauseAndPlay, setstartedAt, skipPercentage = 0) {
-    if (bufferRef.current) {
-      const currentTime = audioContextRef.current.currentTime;
-      const startTime = (skipPercentage / 100) * bufferRef.current.duration;
-      const audioBuffer =  bufferRef.current;
-      createSourceNodeContext(audioContextRef,sourceNodeRef,grainNodeRef, audioBuffer, sound);
-      sourceNodeRef.current.start(0, startTime);
-      pauseAndPlay.setIsPlaying(true);
-      setstartedAt(currentTime - startTime);
-    }
+ export function PlayaudioPercent(audioElementRef, skipPercentage = 0) {
+      if (audioElementRef.current.paused || audioElementRef.current.currentTime > 0) {
+        const sound = parserGet('volume');
+        audioElementRef.current.volume =  sound ? sound : 1 ;
+        audioElementRef.current.play();
+      }
+      if (audioElementRef.current) {
+        const newTime = (skipPercentage / 100) * audioElementRef?.current?.duration;
+        audioElementRef.current.currentTime = newTime;
+      }
   }
 
 

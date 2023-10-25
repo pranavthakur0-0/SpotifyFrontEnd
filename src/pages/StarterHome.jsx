@@ -27,6 +27,7 @@ function StarterHome({children}) {
   const {startedAt, setstartedAt, sound, setpaused } = useContext(TimeContext);
   const {
     audioContextRef,
+    audioElementRef,
     sourceNodeRef,
     grainNodeRef,
     bufferRef
@@ -83,12 +84,12 @@ function StarterHome({children}) {
     if (e.target.tagName.toLowerCase() !== 'input') {
       if (e.keyCode === 32) {
         if (pauseAndPlay.isPlaying) {
-          pauseAudio(audioContextRef, sourceNodeRef, setstartedAt, startedAt);
+          pauseAudio(audioContextRef,audioElementRef,sourceNodeRef, setstartedAt, startedAt);
           pauseAndPlay.setIsPlaying(false);
           setpaused(true);
           Stringify('paused', true);
         } else {
-          Playaudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
+          Playaudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
           pauseAndPlay.setIsPlaying(true);
           setpaused(false);
           Stringify('paused', false);
@@ -96,7 +97,7 @@ function StarterHome({children}) {
         e.preventDefault();
       }
     }
-  }, [pauseAndPlay, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, startedAt, setstartedAt, setpaused]);
+  }, [pauseAndPlay, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, startedAt, setstartedAt, setpaused, audioElementRef]);
 
 
   useEffect(()=>{

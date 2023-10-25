@@ -12,6 +12,7 @@ import { SetcurrentSong, setCurrentPlaylist } from '../components/slice/QueueSli
 function MusicChanger({ item, children, buttonRef, currentPlaylist }) {
   const {
     audioContextRef,
+    audioElementRef,
     sourceNodeRef,
     grainNodeRef,
     bufferRef
@@ -19,7 +20,7 @@ function MusicChanger({ item, children, buttonRef, currentPlaylist }) {
   const { Playlist } = usePlaylist();
   const currentSong =  useSelector(state=>state.Songs.currentSong);
   const dispatch = useDispatch();
-  const { startedAt, setstartedAt, setduration, sound, setpaused, setCurrentTime } = useContext(TimeContext);
+  const { setduration, sound, setpaused, setCurrentTime } = useContext(TimeContext);
   const { pauseAndPlay } = useSong();
   const [Cookie] = useCookies('userId');
   
@@ -27,28 +28,32 @@ function MusicChanger({ item, children, buttonRef, currentPlaylist }) {
     if(currentPlaylist){
       dispatch(setCurrentPlaylist(Playlist.listInfo));
     }
-    if (item?._id !== currentSong?._id) {
+    if(item?._id === currentSong?._id && item){
+      setCurrentTime(0);
+      fetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
+    }
+    if (item?._id !== currentSong?._id && item) {
+     
         setCurrentTime(0);
-        setstartedAt(0); 
-        fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
+        fetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
         dispatch(SetcurrentSong(item));
         pauseAndPlay.setIsPlaying(true);
         setpaused(false);
         Stringify('paused', false);
     } else {
       if (pauseAndPlay.isPlaying) {
-        pauseAudio( audioContextRef, sourceNodeRef, setstartedAt, startedAt);
+        pauseAudio( audioContextRef,audioElementRef, sourceNodeRef);
         pauseAndPlay.setIsPlaying(false);
         setpaused(true);
         Stringify('paused', true);
       } else {
-        Playaudio( audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, sound, setstartedAt, startedAt);
+        Playaudio( audioContextRef, audioElementRef,sourceNodeRef, grainNodeRef, bufferRef, sound);
         pauseAndPlay.setIsPlaying(true);
         setpaused(false);
         Stringify('paused', false);
       }
     }
-  }, [ item, Playlist.listInfo, currentPlaylist, currentSong, dispatch, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, setduration, sound, Cookie, setstartedAt, startedAt, setCurrentTime, setpaused, pauseAndPlay
+  }, [ item, Playlist.listInfo,audioElementRef, currentPlaylist, currentSong, dispatch, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, setduration, sound, Cookie, setCurrentTime, setpaused, pauseAndPlay
   ]);
 
   return (

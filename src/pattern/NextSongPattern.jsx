@@ -14,7 +14,7 @@ export default function NextSongPattern({children}){
     const nextQueue = useSelector(state=>state.Songs.nextQueue);
     const currentSong = useSelector(state=>state.Songs.currentSong);
     const previousQueue = useSelector(state=>state.Songs.previousQueue);
-    const { audioContextRef, sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
+    const { audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef} = useMusicPlayerRefs();
     const [Cookie,] = useCookies('userId');
     const { id } = useParams();
     const currentPlaylist = useSelector(state=>state.Songs.currentPlaylist);
@@ -31,7 +31,7 @@ export default function NextSongPattern({children}){
              if(currentPlaylist?._id === id || currentPlaylist?._id === "collections"){
                 setCurrentTime(0);
                 setstartedAt(0); 
-                fetchAndDecodeAudio(audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, nextCurrentSong, setduration, sound, Cookie);
+                fetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, nextCurrentSong, setduration, sound, Cookie);
                 pauseAndPlay.setIsPlaying(true);
                 setpaused(false);
                 Stringify('paused', false);
