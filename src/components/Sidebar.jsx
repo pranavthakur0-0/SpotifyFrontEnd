@@ -26,7 +26,7 @@ function Sidebar() {
       const route = "/getUserplaylist";
       const response = await authenticatedGetRequest(route, Cookie);
       if (response) {
-         SideBarList.setlistInfo(response.playlistWithUsername);
+         SideBarList.setlistInfo(response?.userPlaylists);
       }
     }
     fetchData();

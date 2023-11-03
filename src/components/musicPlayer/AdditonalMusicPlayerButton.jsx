@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import useMusicPlayerRefs from "./Refs/MusicRefs";
-import { parserGet, Stringify} from "../utils/StorageFun";
+import useMusicPlayerRefs from "../Refs/MusicRefs";
+import { parserGet, Stringify} from "../../utils/StorageFun";
 
 const volume = parserGet('volume');
 export default function AdditionalMusicPlayerButton() {

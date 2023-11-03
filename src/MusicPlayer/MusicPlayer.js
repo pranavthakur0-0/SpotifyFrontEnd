@@ -1,10 +1,12 @@
 
 // import { authenticatedPostRequest } from "../utils/ServerHelpers";
 
+import { authenticatedPostRequest } from "../utils/ServerHelpers";
 import { parserGet } from "../utils/StorageFun";
 
 
 export async function fetchAndDecodeAudio(audioContextRef, audioElementRef,sourceNodeRef, grainNodeRef, bufferRef, playingTrack, setduration, sound, Cookie) {
+  setduration(0);
   // If there's an ongoing request, cancel it
   if (fetchAndDecodeAudio.controller) {
     fetchAndDecodeAudio.controller.abort();
@@ -27,8 +29,14 @@ export async function fetchAndDecodeAudio(audioContextRef, audioElementRef,sourc
   audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
   sourceNodeRef.current = audioContextRef.current.createMediaElementSource(audioElementRef.current);
   sourceNodeRef.current.connect(audioContextRef.current.destination);
-
+  setduration(playingTrack.duration);
   const url = playingTrack.track;
+
+  if(Cookie){
+    const route = "/currentSong"
+    const body = playingTrack;
+    authenticatedPostRequest(route, Cookie, body); 
+  }
 
   fetch(url, { signal })
     .then(response => response.body)
@@ -55,7 +63,7 @@ export async function fetchAndDecodeAudio(audioContextRef, audioElementRef,sourc
     .then(blob => {
       const objectURL = URL.createObjectURL(blob);
       audioElementRef.current.src = objectURL;
-      setduration(playingTrack.duration);
+
       // Start playing as soon as enough data is available
       const sound = parserGet('volume');
       audioElementRef.current.volume =  sound ? sound : 1 ;
@@ -130,9 +138,8 @@ export async function starterfetchAndDecodeAudio(audioContextRef, audioElementRe
 
 export function Playaudio(audioContextRef, audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, setstartedAt, startTime = 0) {
   const sound = parserGet('volume');
-  audioElementRef.current.volume = sound ? sound : 1;
-
   if (audioElementRef.current?.src) {
+    audioElementRef.current.volume = sound ? sound : 1;
     audioElementRef.current.play().catch(error => {
       console.error("Playback cannot be started yet", error);
     });

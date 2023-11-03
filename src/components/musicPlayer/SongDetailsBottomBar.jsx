@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import { authenticatedGetRequest, authenticatedPostRequest } from "../utils/ServerHelpers";
+import { authenticatedGetRequest, authenticatedPostRequest } from "../../utils/ServerHelpers";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
-import { useMenu, useSong } from "../context/contextProvider";
-import { listThumbnail } from "../utils/ImageResizer";
+import { useMenu, useSong } from "../../context/contextProvider";
+import { listThumbnail } from "../../utils/ImageResizer";
 import { useSelector } from "react-redux";
 
 

@@ -15,6 +15,7 @@ export default function Login(){
     const handleChange = async (e) => {
             e.preventDefault();
             try{
+                console.log("here");
                 const response = await makeUnauthenticatedPostRequest('/auth/login', info);
                 if(response.status === 200){
                     const res = await response.json();

@@ -53,6 +53,18 @@ export const authenticatedPostRequest = async (route, Cookie, body)=>{
     return formattedResponse;
 }
 
+export const authenticatedDeleteRequest = async (route, Cookie)=>{
+    const response = await fetch(backendUrl + route, {
+        method : "DELETE",
+        headers : {
+            "Content-Type" : "application/json",
+            "Authorization": `Bearer ${Cookie.userId}`,
+        }
+    });
+    const formattedResponse = await response.json();
+    return formattedResponse;
+}
+
 
 
 export const authenticatedPostRequestWithFile= async (route, Cookie, body, changePlaylistImg) => {

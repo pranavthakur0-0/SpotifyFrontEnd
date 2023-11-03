@@ -14,7 +14,7 @@ function SideBarLibrary() {
 
   const fetchApi = async()=>{
      const response = await handleCreatePlaylist(Cookie);
-     SideBarList.setlistInfo(response.playlistWithUsername);
+     SideBarList.setlistInfo(response?.userPlaylists);
      toastMessage.setMessage(response.msg);
      toastColor.setColor('--essential-announcement');
      toastBool.setPopUp();

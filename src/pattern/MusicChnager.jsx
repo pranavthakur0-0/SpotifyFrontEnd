@@ -1,4 +1,4 @@
-import React, { memo, useContext, useCallback } from 'react';
+import React, { memo, useContext, useCallback, useState } from 'react';
 import { fetchAndDecodeAudio } from '../MusicPlayer/MusicPlayer';
 import useMusicPlayerRefs from '../components/Refs/MusicRefs';
 import { usePlaylist, useSong } from '../context/contextProvider';
@@ -23,14 +23,17 @@ function MusicChanger({ item, children, buttonRef, currentPlaylist }) {
   const { setduration, sound, setpaused, setCurrentTime } = useContext(TimeContext);
   const { pauseAndPlay } = useSong();
   const [Cookie] = useCookies('userId');
-  
+  const [hasExecuted, sethasExecuted] = useState(false);
+
+
   const handleClick = useCallback(() => {
     if(currentPlaylist){
       dispatch(setCurrentPlaylist(Playlist.listInfo));
     }
-    if(item?._id === currentSong?._id && item){
+    if(item?._id === currentSong?._id && item && !hasExecuted){
       setCurrentTime(0);
       fetchAndDecodeAudio(audioContextRef,audioElementRef, sourceNodeRef, grainNodeRef, bufferRef, item, setduration, sound, Cookie);
+      sethasExecuted(true);
     }
     if (item?._id !== currentSong?._id && item) {
      
@@ -53,6 +56,7 @@ function MusicChanger({ item, children, buttonRef, currentPlaylist }) {
         Stringify('paused', false);
       }
     }
+    // eslint-disable-next-line
   }, [ item, Playlist.listInfo,audioElementRef, currentPlaylist, currentSong, dispatch, audioContextRef, sourceNodeRef, grainNodeRef, bufferRef, setduration, sound, Cookie, setCurrentTime, setpaused, pauseAndPlay
   ]);
 

@@ -6,7 +6,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import BottomLogin from "../components/BottomLogin.jsx";
 import Homecomponent from "./Homecomponent.jsx";
 import EditplaylistMenuPopUp from "../components/EditplaylistMenuPopUp.jsx";
-import MusicPlayer from "../components/MusicPlayer.jsx";
+import MusicPlayer from "../components/musicPlayer/MusicPlayer.jsx";
 import SidebarContextProvider from "../context/sidebarProvider";
 import PopupComp from "../components/PopupComp.jsx"
 import { TimeContext } from "./Home";

@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState } from "react";
+import React, { memo, useContext, useRef, useState } from "react";
 import { useEffect } from "react";
 import ImgComponent from "./ImgComponent";
 import { useParams } from "react-router-dom";
@@ -11,6 +11,9 @@ import TwoClickMusicChanger from "../pattern/TwoClickMusicChanger.jsx"
 import DefaultHeading from "../pattern/DefaultHeading";
 import { useSelector } from "react-redux";
 import MainPlayListButton from "../pattern/MainPlayListButton";
+import { AiOutlineEllipsis } from "react-icons/ai";
+import DialogPositioner from "./BasicComponent/DialogPositioner.jsx";
+import PlaylistMenu from "./PlaylistMenu.jsx"
 
 function Playlist(){
     const {setscrollNav} = useContext(NavbarContext);
@@ -21,6 +24,8 @@ function Playlist(){
     const [divWidth, setDivWidth] = useState(0);
     const { pauseAndPlay } = useSong();
     const currentPlaylist = useSelector(state=>state.Songs.currentPlaylist);
+    const [menu, setmenu] = useState(false);
+    const menuref = useRef();
 
      useEffect(() => {
      const route = `/playlist/${id}`;
@@ -57,18 +62,41 @@ function Playlist(){
     },[])
 
 
+    useEffect(()=>{
+      const handleClickOutside = (e) => {
+        if (menuref.current && !menuref.current.contains(e.target)) {
+          setmenu(false);
+        }
+      };
+  
+      document.addEventListener('click', handleClickOutside);
+      return ()=> document.removeEventListener('click', handleClickOutside)
+    },[])
+
+
     return ( <div className="flex relative h-full flex-col">
             <div className="h-full w-full">
                 <ImgComponent id={id} playlist={Playlist.listInfo}/>     
                 <div  className={` relative z-40 h-fit w-full`} >
                     <div className="p-6 flex gap-6 items-center">
-                      {Playlist.listInfo && Playlist.listInfo.songs && Playlist.listInfo.songs.length > 0 ? <React.Fragment>
+                      {Playlist.listInfo && Playlist.listInfo.songs && Playlist.listInfo.songs.length > 0 ?
+                       <React.Fragment>
                         <MainPlayListButton currentPlaylist={Playlist?.listInfo}>
                           <div className="p-[0.8rem] w-fit h-fit rounded-full bg-primary hover:scale-105 hover:bg-[var(--primary-background-highlight)] transition-transform ease-in-out cursor-pointer">
                           {pauseAndPlay?.isPlaying && currentPlaylist?._id === id ?<svg role="img" height="28" width="28" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon" className="Svg-sc-ytk21e-0 haNxPq"><path d="M5.7 3a.7.7 0 0 0-.7.7v16.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V3.7a.7.7 0 0 0-.7-.7H5.7zm10 0a.7.7 0 0 0-.7.7v16.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V3.7a.7.7 0 0 0-.7-.7h-2.6z"></path></svg> :  <svg role="img" height="28" width="28" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon"  ><path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z"></path></svg> }
                           </div>
                         </MainPlayListButton>
-                      </React.Fragment> :  <div className="p-3"><svg role="img" height="32" width="32" aria-hidden="true" viewBox="0 0 24 24" className=" cursor-pointer" data-encore-id="icon" ><path className="fill-[var(--dark-text)]" d="M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm15 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path></svg></div> }
+
+                     
+
+
+
+                      </React.Fragment> :  null }
+                      <button ref={menuref} onClick={e=>setmenu(true)} className=" text-4xl text-gray-400 cursor-pointer rounded-full relative h-fit hover:text-white"><AiOutlineEllipsis />
+                            {menu ? <DialogPositioner>
+                                        <PlaylistMenu setmenu={setmenu} />
+                                    </DialogPositioner> : null}
+                        </button>
                     </div>
                     <div className="py-3 px-12 grid music-grid text-sm font-spotifyLight text-[var(--dark-text)]">
                           {Playlist.listInfo  && Playlist.listInfo.songs &&  Playlist.listInfo.songs.length > 0 ?   <DefaultHeading setDivWidth={setDivWidth} /> : null}

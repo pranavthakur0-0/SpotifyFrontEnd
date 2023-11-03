@@ -1,21 +1,21 @@
 import React, { useRef, useEffect, useState, memo, useContext, } from "react";
-import { authenticatedGetRequest } from "../utils/ServerHelpers";
+import { authenticatedGetRequest } from "../../utils/ServerHelpers.js";
 import { useCookies } from "react-cookie";
-import { useSong } from "../context/contextProvider";
-import {  starterfetchAndDecodeAudio } from "../MusicPlayer/MusicPlayer";
-import { PlayaudioPercent } from "../MusicPlayer/MusicPlayer";
+import { useSong } from "../../context/contextProvider.js";
+import {  starterfetchAndDecodeAudio } from "../../MusicPlayer/MusicPlayer.js";
+import { PlayaudioPercent } from "../../MusicPlayer/MusicPlayer.js";
 import AdditonalMusicPlayerButton from "./AdditonalMusicPlayerButton.jsx"
 import SongDetailsBottomBar from "./SongDetailsBottomBar.jsx"
-import { Stringify, parserGet } from "../utils/StorageFun.js";
-import useMusicPlayerRefs from "./Refs/MusicRefs"
-import { formatTime } from "../MusicPlayer/MusicPlayer";
-import { TimeContext } from "../pages/Home";
-import MusicChnager from "../pattern/MusicChnager";
+import { Stringify, parserGet } from "../../utils/StorageFun.js";
+import useMusicPlayerRefs from "../Refs/MusicRefs.jsx"
+import { formatTime } from "../../MusicPlayer/MusicPlayer.js";
+import { TimeContext } from "../../pages/Home.jsx";
+import MusicChnager from "../../pattern/MusicChnager.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { SetcurrentSong,} from "../components/slice/QueueSlice";
-import NextSongPattern from "../pattern/NextSongPattern";
-import PreviousSongPattern from "../pattern/PreviousSongPattern";
-import { PlaynextFunction } from "../utils/MusicPlayerFunction";
+import { SetcurrentSong,} from "../slice/QueueSlice.js";
+import NextSongPattern from "../../pattern/NextSongPattern.jsx";
+import PreviousSongPattern from "../../pattern/PreviousSongPattern.jsx";
+import { PlaynextFunction } from "../../utils/MusicPlayerFunction.js";
 
 
 function MusicPlayer() {
